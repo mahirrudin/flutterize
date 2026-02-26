@@ -26,7 +26,14 @@ clean:
 	rm -rf $(CERTS_DIR)/*.pem
 
 vulnerable:
-	@bash scripts/toggle-vuln.sh vulnerable
+	@bash scripts/toggle-vuln.sh on $(filter-out $@,$(MAKECMDGOALS))
 
 secure:
 	@bash scripts/toggle-vuln.sh secure
+
+list:
+	@bash scripts/toggle-vuln.sh list
+
+# Catch-all to prevent "No rule to make target" errors for vuln arguments
+%:
+	@:

@@ -26,8 +26,7 @@ class ApiService {
     }
 
     HttpClient httpClient = HttpClient(context: context);
-    // Allow self-signed certificates during development
-    httpClient.badCertificateCallback = (cert, host, port) => true;
+    // SECURE #8: No badCertificateCallback — SSL pinning enforced
 
     _client = IOClient(httpClient);
     return _client!;

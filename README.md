@@ -39,10 +39,18 @@ make logs
 
 ## Vulnerability Mode
 
+Each vulnerability can be toggled individually by swapping source files between secure and vulnerable versions.
+
 ```bash
-make vulnerable    # Enable all security vulnerabilities
-make secure        # Revert to secure code
+make list                  # Show all vulnerabilities with ON/OFF status
+make vulnerable 1 3 10     # Enable specific vulnerabilities by number
+make vulnerable all        # Enable all vulnerabilities
+make secure                # Disable all (restore secure code)
 ```
+
+> [!NOTE]
+> Vulns **4, 5, 6, 7** (mass assignment, user enumeration, token leak, stored XSS) share the same source files and toggle as a group.
+> Flutter client vulns (**8, 9**) require hot-reloading the app after toggling.
 
 See [VULNERABILITIES.md](VULNERABILITIES.md) for exploitation guides and remediation hints.
 
