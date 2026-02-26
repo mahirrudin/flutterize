@@ -41,13 +41,17 @@ load_state() {
   ENABLED=()
   if [ -f "$STATE_FILE" ]; then
     while IFS= read -r id; do
-      ENABLED+=("$id")
+      [ -n "$id" ] && ENABLED+=("$id")
     done < "$STATE_FILE"
   fi
 }
 
 save_state() {
-  printf "%s\n" "${ENABLED[@]}" | sort -n | uniq > "$STATE_FILE"
+  if [ ${#ENABLED[@]} -eq 0 ]; then
+    > "$STATE_FILE"
+  else
+    printf "%s\n" "${ENABLED[@]}" | sort -n | uniq > "$STATE_FILE"
+  fi
 }
 
 is_enabled() {
@@ -124,9 +128,13 @@ apply_all_files() {
 
   if $changed_backend; then
     echo "    ✓ Backend files swapped"
-    echo "==> Rebuilding backend containers..."
-    cd "$BASE_DIR"
-    docker compose up -d --build 2>&1 | tail -5
+    if [ -f "$BASE_DIR/.env" ]; then
+      echo "==> Rebuilding backend containers..."
+      cd "$BASE_DIR"
+      docker compose up -d --build 2>&1 | tail -5
+    else
+      echo "    ⓘ Skipped Docker rebuild (.env not found — run 'cp .env.example .env' first)"
+    fi
   fi
 
   if $changed_flutter; then
