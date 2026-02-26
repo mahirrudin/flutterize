@@ -1,0 +1,3 @@
+CREATE USER IF NOT EXISTS 'flutterize_api'@'%' IDENTIFIED BY '${DB_PASS}';
+GRANT SELECT, INSERT, UPDATE, DELETE ON flutterize.* TO 'flutterize_api'@'%';
+FLUSH PRIVILEGES;

@@ -1,0 +1,65 @@
+services:
+  db:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  api:
+    build: ./backend
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+    depends_on:
+      db:
+        condition: service_healthy
+      mockmail:
+        condition: service_started
+      mocksms:
+        condition: service_started
+    volumes:
+      - ./certs:/app/certs:ro
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB_NAME: ${DB_NAME}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      TLS_CERT: ${TLS_CERT}
+      TLS_KEY: ${TLS_KEY}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMS_GATEWAY_URL: ${SMS_GATEWAY_URL}
+      SERVER_PORT: ${SERVER_PORT}
+      SEED_ADMIN_EMAIL: ${SEED_ADMIN_EMAIL}
+      SEED_ADMIN_PHONE: ${SEED_ADMIN_PHONE}
+      SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD}
+      SEED_ADMIN_POINTS: ${SEED_ADMIN_POINTS}
+      SEED_USER_EMAIL: ${SEED_USER_EMAIL}
+      SEED_USER_PHONE: ${SEED_USER_PHONE}
+      SEED_USER_PASSWORD: ${SEED_USER_PASSWORD}
+      SEED_USER_POINTS: ${SEED_USER_POINTS}
+
+  mockmail:
+    build: ./mockmail
+    ports:
+      - "2525:2525"
+      - "8025:8025"
+
+  mocksms:
+    build: ./mocksms
+    ports:
+      - "7600:7600"
+
+volumes:
+  mysql_data:
